@@ -1,37 +1,6 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Maintainer: 
-"       Amir Salihefendic — @amix3k
-"
-" Awesome_version:
-"       Get this config, nice color schemes and lots of plugins!
-"
-"       Install the awesome version from:
-"
-"           https://github.com/amix/vimrc
-"
-" Sections:
-"    -> General
-"    -> VIM user interface
-"    -> Colors and Fonts
-"    -> Files and backups
-"    -> Text, tab and indent related
-"    -> Visual mode related
-"    -> Moving around, tabs and buffers
-"    -> Status line
-"    -> Editing mappings
-"    -> vimgrep searching and cope displaying
-"    -> Spell checking
-"    -> Misc
-"    -> Helper functions
-"
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Sets how many lines of history VIM has to remember
 set history=500
+set relativenumber
+set number
 
 " Enable filetype plugins
 filetype plugin on
@@ -77,7 +46,7 @@ else
 endif
 
 "Always show current position
-set ruler
+"set ruler
 
 " Height of the command bar
 set cmdheight=1
@@ -125,7 +94,7 @@ endif
 
 
 " Add a bit extra margin to the left
-set foldcolumn=1
+"set foldcolumn=1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -140,7 +109,7 @@ if $COLORTERM == 'gnome-terminal'
 endif
 
 try
-    colorscheme desert
+    colorscheme peaksea
 catch
 endtry
 
@@ -264,7 +233,41 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 set laststatus=2
 
 " Format the status line
-set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
+"set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ \%r%h\ \ \ Ln\ %l\ \ Col\ %c
+
+function! File_size(f)
+    let l:size = getfsize(expand(a:f))
+    if l:size == 0 || l:size == -1 || l:size == -2
+        return ''
+    endif
+    if l:size < 1024
+        return l:size.' bytes'
+    elseif l:size < 1048576
+        return printf('%.1f', l:size/1024.0). 'K'
+    elseif l:size < 1024*1048576
+        return printf('%.1f', l:size/1048576.0). 'M'
+    else
+        return printf('%.1f', l:size/1024.0/1048576.0) . 'G'
+    endif
+endfunction
+
+set statusline=%1*\ %{HasPaste()}%*
+set statusline+=%2*[%<%F%m%r%h%w]\ %*
+set statusline+=%3*\ %Y\ %*
+set statusline+=%5*\ %{strftime(\"%m-%d\ %H:%M\")}%=\ %*
+set statusline+=%6*\ %lL,\ %vC\ \{%c\}\ %*
+set statusline+=%7*\ %P\ %*
+set statusline+=%8*\ %<%{File_size(@%)}\ %*
+set statusline+=%9*\ %-R\ %-W\ \[%-b\]\ buf:%-n\ \ %*
+
+hi User1 cterm=bold ctermfg=74 ctermbg=None
+hi User2 cterm=bold ctermfg=232 ctermbg=179
+hi User3 cterm=bold ctermfg=142 ctermbg=None
+hi User4 cterm=None
+hi User5 cterm=bold ctermfg=cyan ctermbg=None
+hi User6 cterm=bold ctermfg=yellow ctermbg=240
+hi User7 cterm=None ctermfg=201 ctermbg=None
+hi User8 cterm=None ctermfg=red ctermbg=None
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -299,6 +302,13 @@ if has("autocmd")
     autocmd BufWritePre *.txt,*.js,*.py,*.wiki,*.sh,*.coffee :call CleanExtraSpaces()
 endif
 
+" Map auto complete of (, ... and  ", '.
+inoremap $1 ()<esc>i
+inoremap $2 []<esc>i
+inoremap $3 {}<esc>i
+inoremap $4 {<esc>o}<esc>O
+inoremap $q ''<esc>i
+inoremap $e ""<esc>i
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Spell checking
